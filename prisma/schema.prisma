@@ -1,0 +1,81 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Agents {
+  id          String @id @default(cuid())
+  nom         String
+  prenom      String
+  mdp         String
+  id_fonction String
+  statut      String
+  email       String @unique
+}
+
+model Pharmacices {
+  id           String     @id @default(cuid())
+  nom          String
+  telephone    String
+  commune      String
+  communeavenu String
+  id_quartier  String
+  Produits     Produits[]
+
+  qurtier Quartier @relation(fields: [id_quartier], references: [id])
+}
+
+model Produits {
+  id           String      @id @default(cuid())
+  nom          String
+  dosage       String
+  prix         String
+  desciption   String
+  id_pharmacie String
+  pharmacie    Pharmacices @relation(fields: [id_pharmacie], references: [id])
+}
+
+model Pays {
+  id     String   @id @default(cuid())
+  nom    String
+  Villes Villes[]
+}
+
+model Villes {
+  id      String @id @default(cuid())
+  nom     String
+  id_pays String
+
+  pays    Pays      @relation(fields: [id_pays], references: [id])
+  Commune Commune[]
+}
+
+model Commune {
+  id       String @id @default(cuid())
+  nom      String
+  id_ville String
+
+  pays     Villes     @relation(fields: [id_ville], references: [id])
+  paysId   String?
+  Quartier Quartier[]
+}
+
+model Quartier {
+  id         String @id @default(cuid())
+  nom        String
+  id_commune String
+
+  commune     Commune       @relation(fields: [id_commune], references: [id])
+  paysId      String?
+  Pharmacices Pharmacices[]
+}
